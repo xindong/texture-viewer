@@ -158,6 +158,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="tv.fx" />
+    <CustomBuild Include="tv.fx" />
   </ItemGroup>
 </Project>

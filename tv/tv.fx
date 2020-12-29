@@ -69,7 +69,7 @@ float4 getColor(float4 clr)
 
     if (ToneMapping)
         return float4(aces(clr.rgb), 1.0);
-    return clr;
+    return float4(clr.rgb, 1.0);
 }
 
 //--------------------------------------------------------------------------------------
