@@ -6,15 +6,8 @@ setlocal
 set error=0
 
 set FXCOPTS=/nologo /WX /Ges /Zi /Zpc /Qstrip_reflect /Qstrip_debug
-
-set PCFXC="%WindowsSdkVerBinPath%x86\fxc.exe"
-if exist %PCFXC% goto continue
-set PCFXC="%WindowsSdkBinPath%%WindowsSDKVersion%\x86\fxc.exe"
-if exist %PCFXC% goto continue
-set PCFXC="%WindowsSdkDir%bin\%WindowsSDKVersion%\x86\fxc.exe"
-if exist %PCFXC% goto continue
-
-set PCFXC=fxc.exe
+cd %~dp0
+set PCFXC=..\..\fxc.exe
 
 :continue
 @if not exist Compiled mkdir Compiled

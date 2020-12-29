@@ -55,13 +55,7 @@
     <ClCompile Include="..\DirectXTex\DirectXTexConvert.cpp">
       <Filter>DirectXTex</Filter>
     </ClCompile>
-    <ClCompile Include="..\DirectXTex\DirectXTexCompressGPU.cpp">
-      <Filter>DirectXTex</Filter>
-    </ClCompile>
     <ClCompile Include="..\DirectXTex\DirectXTexCompress.cpp">
-      <Filter>DirectXTex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\DirectXTex\BCDirectCompute.cpp">
       <Filter>DirectXTex</Filter>
     </ClCompile>
     <ClCompile Include="..\DirectXTex\BC6HBC7.cpp">
@@ -124,9 +118,6 @@
       <Filter>DirectXTex</Filter>
     </ClInclude>
     <ClInclude Include="..\DirectXTex\DDS.h">
-      <Filter>DirectXTex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\DirectXTex\BCDirectCompute.h">
       <Filter>DirectXTex</Filter>
     </ClInclude>
     <ClInclude Include="..\DirectXTex\BC.h">

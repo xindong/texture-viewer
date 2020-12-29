@@ -119,9 +119,7 @@
     <ClCompile Include="..\DirectXTex\BC.cpp" />
     <ClCompile Include="..\DirectXTex\BC4BC5.cpp" />
     <ClCompile Include="..\DirectXTex\BC6HBC7.cpp" />
-    <ClCompile Include="..\DirectXTex\BCDirectCompute.cpp" />
     <ClCompile Include="..\DirectXTex\DirectXTexCompress.cpp" />
-    <ClCompile Include="..\DirectXTex\DirectXTexCompressGPU.cpp" />
     <ClCompile Include="..\DirectXTex\DirectXTexConvert.cpp" />
     <ClCompile Include="..\DirectXTex\DirectXTexD3D11.cpp" />
     <ClCompile Include="..\DirectXTex\DirectXTexDDS.cpp" />
@@ -154,7 +152,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\DirectXTex\BC.h" />
-    <ClInclude Include="..\DirectXTex\BCDirectCompute.h" />
     <ClInclude Include="..\DirectXTex\d3dx12.h" />
     <ClInclude Include="..\DirectXTex\DDS.h" />
     <ClInclude Include="..\DirectXTex\DirectXTex.h" />
