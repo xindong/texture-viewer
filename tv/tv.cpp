@@ -20,6 +20,7 @@
 #include "../imgui/imgui_impl_win32.h"
 #include "../imgui/imgui_impl_dx11.h"
 
+using namespace std;
 using namespace DirectX;
 namespace fs = std::filesystem;
 
@@ -38,8 +39,10 @@ struct CBArrayControl
 {
     float Index;
     int Channel;
-    float padding[2];
-};
+    int ToneMapping;
+    float padding[1];
+}cb = {};
+
 #pragma pack(pop)
 
 //--------------------------------------------------------------------------------------
@@ -86,8 +89,6 @@ ID3D11ShaderResourceView*   g_pSRV = nullptr;
 ID3D11BlendState*           g_AlphaBlendState = nullptr;
 ID3D11SamplerState*         g_pSamplerLinear = nullptr;
 
-UINT                        g_iCurrentIndex = 0;
-UINT                        g_iChannel = 0;
 UINT                        g_iMaxIndex = 1;
 
 UINT                        g_iIndices = 0;
@@ -158,12 +159,22 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
         else if (ext == ".bmp" || ext == ".jpg" || ext == ".png" || ext == ".tiff" || ext == ".gif" || ext == ".wmp" || ext == ".ico")
         {
             loader = LOADER_WIC;
+            // Initialize COM (needed for WIC)
+            hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+            if (FAILED(hr))
+            {
+                wprintf(L"Failed to initialize COM (%08X)\n", static_cast<unsigned int>(hr));
+                return 0;
+            }
+
             hr = GetMetadataFromWICFile(lpCmdLine, WIC_FLAGS_NONE, mdata);
         }
         if (FAILED(hr) || loader == LOADER_COUNT)
         {
             wchar_t buff[2048] = {};
-            swprintf_s(buff, L"Failed to open texture file\n\nFilename = %ls\nHRESULT %08X", lpCmdLine, static_cast<unsigned int>(hr));
+            string message = std::system_category().message(hr);
+            wstring ws = { message.begin(), message.end() };
+            swprintf_s(buff, L"Failed to open texture file\n\n%ls\n\n%s", lpCmdLine, ws.c_str());
             MessageBoxW(nullptr, buff, L"tv", MB_OK | MB_ICONEXCLAMATION);
             return 0;
         }
@@ -418,37 +429,46 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
         case WM_KEYDOWN:
             if ( wParam == VK_RIGHT )
             {
-                if ( g_iCurrentIndex < g_iMaxIndex-1 )
-                    ++g_iCurrentIndex;
+                if ( cb.Index < g_iMaxIndex-1 )
+                    ++cb.Index;
             }
             else if ( wParam == VK_LEFT )
             {
-                if ( g_iCurrentIndex > 0 )
+                if ( cb.Index > 0 )
                 {
-                    --g_iCurrentIndex;
+                    --cb.Index;
                 }
             }
             else if ( wParam >= '0' && wParam <= '9' )
             {
                 UINT index = (wParam == '0') ? 10 : ((UINT) (wParam - '1'));
                 if ( index < g_iMaxIndex )
-                    g_iCurrentIndex = index;
+                    cb.Index = index;
+            }
+            else if (wParam == VK_SPACE)
+            {
+                // reset states
+                cb = {};
             }
             else if (wParam == 'R')
             {
-                g_iChannel = (g_iChannel == 1) ? 0 : 1;
+                cb.Channel = (cb.Channel == 1) ? 0 : 1;
             }
             else if (wParam == 'G')
             {
-                g_iChannel = (g_iChannel == 2) ? 0 : 2;
+                cb.Channel = (cb.Channel == 2) ? 0 : 2;
             }
             else if (wParam == 'B')
             {
-                g_iChannel = (g_iChannel == 3) ? 0 : 3;
+                cb.Channel = (cb.Channel == 3) ? 0 : 3;
             }
             else if (wParam == 'A')
             {
-                g_iChannel = (g_iChannel == 4) ? 0 : 4;
+                cb.Channel = (cb.Channel == 4) ? 0 : 4;
+            }
+            else if (wParam == 'T')
+            {
+                cb.ToneMapping = 1 - cb.ToneMapping;
             }
             else if (wParam == VK_ESCAPE)
             {
@@ -790,7 +810,7 @@ HRESULT InitDevice( const TexMetadata& mdata )
 void Render()
 {
     {
-        static bool show_demo_window = true;
+        static bool show_demo_window = false;
 
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
@@ -821,9 +841,6 @@ void Render()
     float bf [4] = {1.0f, 1.0f, 1.0f, 1.0f};
     g_pImmediateContext->OMSetBlendState( g_AlphaBlendState, bf, 0xffffffff );
 
-    CBArrayControl cb;
-    cb.Index = (float)g_iCurrentIndex;
-    cb.Channel = g_iChannel;
     g_pImmediateContext->UpdateSubresource( g_pCBArrayControl, 0, nullptr, &cb, 0, 0 );
 
     g_pImmediateContext->VSSetShader( g_pVertexShader, nullptr, 0 );

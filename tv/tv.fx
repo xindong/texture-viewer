@@ -22,6 +22,7 @@ cbuffer cbArrayControl  : register( b0 )
 {
     float Index;
     int Channel;
+    int ToneMapping;
 };
 
 //--------------------------------------------------------------------------------------
@@ -49,12 +50,25 @@ PS_INPUT VS( VS_INPUT input )
     return output;
 }
 
+// Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
+float3 aces(float3 x) {
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+}
+
 float4 getColor(float4 clr)
 {
     if (Channel == 1) return float4(clr.r, clr.r, clr.r, 1);
     if (Channel == 2) return float4(clr.g, clr.g, clr.g, 1);
     if (Channel == 3) return float4(clr.b, clr.b, clr.b, 1);
     if (Channel == 4) return float4(clr.a, clr.a, clr.a, 1);
+
+    if (ToneMapping)
+        return float4(aces(clr.rgb), 1.0);
     return clr;
 }
 
