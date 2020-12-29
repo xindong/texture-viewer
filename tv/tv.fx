@@ -21,6 +21,7 @@ SamplerState samLinear : register( s0 );
 cbuffer cbArrayControl  : register( b0 )
 {
     float Index;
+    int Channel;
 };
 
 //--------------------------------------------------------------------------------------
@@ -48,28 +49,36 @@ PS_INPUT VS( VS_INPUT input )
     return output;
 }
 
+float4 getColor(float4 clr)
+{
+    if (Channel == 1) return float4(clr.r, clr.r, clr.r, 1);
+    if (Channel == 2) return float4(clr.g, clr.g, clr.g, 1);
+    if (Channel == 3) return float4(clr.b, clr.b, clr.b, 1);
+    if (Channel == 4) return float4(clr.a, clr.a, clr.a, 1);
+    return clr;
+}
 
 //--------------------------------------------------------------------------------------
 // Pixel Shader
 //--------------------------------------------------------------------------------------
 float4 PS_1D( PS_INPUT input) : SV_Target
 {
-    return tx1D.Sample( samLinear, input.Tex.x );
+    return getColor(tx1D.Sample( samLinear, input.Tex.x ));
 }
 
 float4 PS_1DArray( PS_INPUT input) : SV_Target
 {
-    return tx1DArray.Sample( samLinear, float2(input.Tex.x, Index) );
+    return getColor(tx1DArray.Sample( samLinear, float2(input.Tex.x, Index) ));
 }
 
 float4 PS_2D( PS_INPUT input) : SV_Target
 {
-    return tx2D.Sample( samLinear, input.Tex.xy );
+    return getColor(tx2D.Sample( samLinear, input.Tex.xy ));
 }
 
 float4 PS_2DArray( PS_INPUT input) : SV_Target
 {
-    return tx2DArray.Sample( samLinear, float3(input.Tex.xy, Index) );
+    return getColor(tx2DArray.Sample( samLinear, float3(input.Tex.xy, Index) ));
 }
 
 float4 PS_3D( PS_INPUT input) : SV_Target
@@ -77,10 +86,10 @@ float4 PS_3D( PS_INPUT input) : SV_Target
     int Width, Height, Depth;
     tx3D.GetDimensions( Width, Height, Depth);
 
-    return tx3D.Sample( samLinear, float3(input.Tex.xy, Index / Depth) );
+    return getColor(tx3D.Sample( samLinear, float3(input.Tex.xy, Index / Depth) ));
 }
 
 float4 PS_Cube( PS_INPUT input) : SV_Target
 {
-    return tx2DArray.Sample( samLinear, float3(input.Tex.xy, input.Tex.z + (6*Index)) );
+    return getColor(tx2DArray.Sample( samLinear, float3(input.Tex.xy, input.Tex.z + (6*Index)) ));
 }

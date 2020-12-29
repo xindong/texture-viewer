@@ -37,7 +37,8 @@ struct SimpleVertex
 struct CBArrayControl
 {
     float Index;
-    float pad[3];
+    int Channel;
+    float padding[2];
 };
 #pragma pack(pop)
 
@@ -86,6 +87,7 @@ ID3D11BlendState*           g_AlphaBlendState = nullptr;
 ID3D11SamplerState*         g_pSamplerLinear = nullptr;
 
 UINT                        g_iCurrentIndex = 0;
+UINT                        g_iChannel = 0;
 UINT                        g_iMaxIndex = 1;
 
 UINT                        g_iIndices = 0;
@@ -431,6 +433,22 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
                 UINT index = (wParam == '0') ? 10 : ((UINT) (wParam - '1'));
                 if ( index < g_iMaxIndex )
                     g_iCurrentIndex = index;
+            }
+            else if (wParam == 'R')
+            {
+                g_iChannel = (g_iChannel == 1) ? 0 : 1;
+            }
+            else if (wParam == 'G')
+            {
+                g_iChannel = (g_iChannel == 2) ? 0 : 2;
+            }
+            else if (wParam == 'B')
+            {
+                g_iChannel = (g_iChannel == 3) ? 0 : 3;
+            }
+            else if (wParam == 'A')
+            {
+                g_iChannel = (g_iChannel == 4) ? 0 : 4;
             }
             else if (wParam == VK_ESCAPE)
             {
@@ -805,6 +823,7 @@ void Render()
 
     CBArrayControl cb;
     cb.Index = (float)g_iCurrentIndex;
+    cb.Channel = g_iChannel;
     g_pImmediateContext->UpdateSubresource( g_pCBArrayControl, 0, nullptr, &cb, 0, 0 );
 
     g_pImmediateContext->VSSetShader( g_pVertexShader, nullptr, 0 );
