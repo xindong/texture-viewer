@@ -113,6 +113,41 @@ LRESULT CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
 void Render();
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+bool isPathSupported(const fs::path& path)
+{
+    auto ext = path.extension();
+    // TODO: too ugly..
+    if (ext == ".dds" || ext == ".tga" || ext == ".hdr" || ext == ".bmp" || ext == ".jpg" || ext == ".png" || ext == ".tiff" || ext == ".gif" || ext == ".wmp" || ext == ".ico")
+    {
+        return true;
+    }
+
+    return false;
+}
+
+vector<fs::path> listNeighborFiles(const fs::path& path)
+{
+    vector<fs::path> files;
+    auto dir = path.parent_path();
+    for (auto& p : fs::recursive_directory_iterator(dir, fs::directory_options::follow_directory_symlink))
+    {
+        if (isPathSupported(p.path()))
+        {
+            files.push_back(p.path());
+        }
+    }
+
+    return files;
+}
+
+vector<fs::path> neighborFiles;
+
+bool loadTexture(fs::path path)
+{
+
+    return true;
+}
+
 //--------------------------------------------------------------------------------------
 #pragma warning( suppress : 6262 )
 int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR, _In_ int nCmdShow )
@@ -134,6 +169,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
     auto lpCmdLine = filename.c_str();
     fs::path filepath = filename;
+    neighborFiles = listNeighborFiles(filepath);
     HRESULT hr = S_OK;
     LoaderType loader = LOADER_COUNT;
 
