@@ -142,6 +142,15 @@ vector<fs::path> listNeighborFiles(const fs::path& path)
 
 vector<fs::path> neighborFiles;
 
+DXGI_FORMAT getSafeFormat(DXGI_FORMAT in)
+{
+    if (in == DXGI_FORMAT_D24_UNORM_S8_UINT) return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+    if (in == DXGI_FORMAT_D32_FLOAT_S8X24_UINT) return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+    if (in == DXGI_FORMAT_D16_UNORM) return DXGI_FORMAT_R16_UNORM;
+
+    return in;
+}
+
 bool loadTexture(fs::path path)
 {
 
@@ -296,6 +305,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
         return 0;
     }
 
+    mdata.format = getSafeFormat(mdata.format);
+    for (int i = 0; i < image.GetImageCount(); i++)
+    {
+        auto ptr = (Image*)image.GetImages();
+        ptr[i].format = getSafeFormat(mdata.format);
+    }
     // Special case to make sure Texture cubes remain arrays
     mdata.miscFlags &= ~TEX_MISC_TEXTURECUBE;
 
