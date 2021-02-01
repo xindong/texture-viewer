@@ -19,6 +19,7 @@
 #include "DirectXTex.h"
 #include "../imgui/imgui_impl_win32.h"
 #include "../imgui/imgui_impl_dx11.h"
+#include "../tinyexr/tinyexr.h"
 
 using namespace std;
 using namespace DirectX;
@@ -102,6 +103,7 @@ enum LoaderType
     LOADER_TGA,
     LOADER_HDR,
     LOADER_WIC,
+    LOADER_EXR,
 
     LOADER_COUNT,
 };
@@ -179,7 +181,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
     auto lpCmdLine = filename.c_str();
     fs::path filepath = filename;
     neighborFiles = listNeighborFiles(filepath);
-    HRESULT hr = S_OK;
+    HRESULT hr = E_FAIL;
     LoaderType loader = LOADER_COUNT;
 
     TexMetadata mdata = {};
@@ -213,6 +215,57 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
             }
 
             hr = GetMetadataFromWICFile(lpCmdLine, WIC_FLAGS_NONE, mdata);
+        }
+        else if (ext == ".exr")
+        {
+            const char* err = NULL;
+
+            loader = LOADER_EXR;
+            string file = filepath.string();
+            auto input_filename = file.c_str();
+            int ret = IsEXR(input_filename);
+            if (ret == TINYEXR_SUCCESS)
+            {
+                EXRVersion exr_version;
+                ret = ParseEXRVersionFromFile(&exr_version, input_filename);
+                int a = 0;
+
+                if (exr_version.multipart == 0)
+                {
+                    EXRHeader exr_header;
+                    InitEXRHeader(&exr_header);
+
+                    ret =
+                        ParseEXRHeaderFromFile(&exr_header, &exr_version, input_filename, &err);
+                    if (ret != 0) {
+                        fprintf(stderr, "Parse single-part EXR err: %s\n", err);
+                        FreeEXRErrorMessage(err);
+                        return ret;
+                    }
+
+                    if (exr_header.num_custom_attributes > 0) {
+                        printf("# of custom attributes = %d\n", exr_header.num_custom_attributes);
+                        for (int i = 0; i < exr_header.num_custom_attributes; i++) {
+                            printf("  [%d] name = %s, type = %s, size = %d\n", i,
+                                exr_header.custom_attributes[i].name,
+                                exr_header.custom_attributes[i].type,
+                                exr_header.custom_attributes[i].size);
+                            // if (strcmp(exr_header.custom_attributes[i].type, "float") == 0) {
+                            //  printf("    value = %f\n", *reinterpret_cast<float
+                            //  *>(exr_header.custom_attributes[i].value));
+                            //}
+                        }
+                    }
+
+                    for (int i = 0; i < exr_header.num_channels; i++) {
+                        if (exr_header.pixel_types[i] == TINYEXR_PIXELTYPE_HALF) {
+                        }
+                        else if (exr_header.pixel_types[i] == TINYEXR_PIXELTYPE_FLOAT) {
+                        }
+                    }
+                }
+
+            }
         }
         if (FAILED(hr) || loader == LOADER_COUNT)
         {

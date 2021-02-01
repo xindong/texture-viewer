@@ -141,6 +141,7 @@
     <ClCompile Include="..\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="..\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\tinyexr\tinyexr.cc" />
     <ClCompile Include="tv.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +167,7 @@
     <ClInclude Include="..\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\imgui\imstb_textedit.h" />
     <ClInclude Include="..\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\tinyexr\tinyexr.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="tv.fx">

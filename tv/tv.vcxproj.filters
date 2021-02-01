@@ -11,6 +11,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{55fef3ef-ed02-4a4d-b0cd-0e59cf26fd34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tinyexr">
+      <UniqueIdentifier>{957afcdc-e4c6-447b-9f78-38b93ec9dcfb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\DirectXTex\DirectXTexWIC.cpp">
@@ -89,6 +92,9 @@
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="tv.cpp" />
+    <ClCompile Include="..\tinyexr\tinyexr.cc">
+      <Filter>tinyexr</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tv.rc">
@@ -146,6 +152,9 @@
     </ClInclude>
     <ClInclude Include="..\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinyexr\tinyexr.h">
+      <Filter>tinyexr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
